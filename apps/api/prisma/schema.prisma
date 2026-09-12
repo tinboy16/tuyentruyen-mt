@@ -1,0 +1,144 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Game {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  duration    Int      @default(60)
+  status      String   @default("active")
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  sessions    GameSession[]
+  scores      Score[]
+  items       GameItem[]
+
+  @@index([status])
+}
+
+model Player {
+  id           String   @id @default(cuid())
+  nickname     String
+
+  createdAt    DateTime @default(now())
+  lastPlayedAt DateTime?
+
+  sessions     GameSession[]
+  scores       Score[]
+
+  @@index([nickname])
+}
+
+model GameSession {
+  id                String    @id @default(cuid())
+  gameId            String
+  playerId          String?
+  sessionToken      String    @unique
+
+  startedAt         DateTime  @default(now())
+  expiresAt         DateTime
+  submittedAt       DateTime?
+
+  submitAttempts    Int       @default(0)
+
+  suspicious        Boolean   @default(false)
+  suspiciousReason  String?
+  suspiciousAt      DateTime?
+
+  ipHash            String?
+  userAgentHash     String?
+
+  actionCount       Int       @default(0)
+  goodHits          Int       @default(0)
+  mistakes          Int       @default(0)
+  lastActionAt      DateTime?
+
+  game              Game      @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  player            Player?   @relation(fields: [playerId], references: [id], onDelete: SetNull)
+
+  score             Score?
+  actions           GameAction[]
+
+  @@index([gameId])
+  @@index([playerId])
+  @@index([startedAt])
+  @@index([suspicious])
+}
+
+model Score {
+  id         String   @id @default(cuid())
+
+  gameId     String
+  sessionId  String   @unique
+  playerId   String?
+
+  score      Int      @default(0)
+  goodHits   Int      @default(0)
+  mistakes   Int      @default(0)
+  duration   Int      @default(0)
+
+  verified   Boolean  @default(false)
+
+  createdAt  DateTime @default(now())
+
+  game       Game         @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  session    GameSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  player     Player?      @relation(fields: [playerId], references: [id], onDelete: SetNull)
+
+  @@index([gameId, score])
+  @@index([gameId, verified, score])
+  @@index([playerId])
+  @@index([createdAt])
+}
+
+model GameItem {
+  id            String   @id @default(cuid())
+
+  gameId        String
+  itemKey       String
+
+  name          String?
+  imageUrl      String
+
+  correctAnswer String
+
+  active        Boolean  @default(true)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  game          Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@unique([gameId, itemKey])
+  @@index([gameId])
+  @@index([gameId, active])
+}
+
+model GameAction {
+  id          String   @id @default(cuid())
+
+  sessionId   String
+  sequence    Int
+
+  itemKey     String
+  answer      String
+
+  correct     Boolean
+
+  createdAt   DateTime @default(now())
+
+  session     GameSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, sequence])
+  @@index([sessionId])
+  @@index([sessionId, createdAt])
+}

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+  >
+
+  <meta name="theme-color" content="#0f766e">
+
+  <title>Đội Đặc Nhiệm Nhí</title>
+<link rel="stylesheet" href="style.css">
+ 
+</head>
+
+<body>
+
+<div id="game">
+
+  <!-- ==========================================
+       DECOR
+       ========================================== -->
+
+  <div class="sun"></div>
+
+  <div class="cloud c1"></div>
+  <div class="cloud c2"></div>
+  <div class="cloud c3"></div>
+
+  <!-- ==========================================
+       HUD
+       ========================================== -->
+
+  <div id="hud">
+
+    <div class="hud-box">
+      <div class="hud-label">Điểm</div>
+      <div class="hud-value" id="scoreValue">0</div>
+    </div>
+
+    <div class="hud-box">
+      <div class="hud-label">Combo</div>
+      <div class="hud-value" id="comboValue">0</div>
+    </div>
+
+    <div class="hud-box">
+      <div class="hud-label">Mạng</div>
+      <div class="hud-value" id="livesValue">❤️❤️❤️</div>
+    </div>
+
+    <div class="hud-box">
+      <div class="hud-label">Thời gian</div>
+      <div class="hud-value" id="timerValue">60</div>
+    </div>
+
+  </div>
+
+  <!-- ==========================================
+       PLAY AREA
+       ========================================== -->
+
+  <div id="playArea"></div>
+
+  <div id="flash"></div>
+
+  <!-- ==========================================
+       START OVERLAY
+       ========================================== -->
+
+  <div
+    class="overlay"
+    id="startOverlay"
+  >
+
+    <div class="panel">
+
+      <div class="logo-circle">
+        🛡️
+      </div>
+
+      <h1>Đội Đặc Nhiệm Nhí</h1>
+
+      <div class="subtitle">
+        Trở thành chiến binh thông thái!
+        Hãy chọn những thứ an toàn và tránh
+        những thứ không rõ nguồn gốc.
+      </div>
+
+      <label
+        class="nickname-label"
+        for="nicknameInput"
+      >
+        Tên của em
+      </label>
+
+      <input
+        id="nicknameInput"
+        type="text"
+        maxlength="20"
+        autocomplete="off"
+        placeholder="Ví dụ: Tí"
+      >
+
+      <div class="rules">
+
+        <div class="rule">
+          <strong>🟢 Vật an toàn:</strong>
+          Chạm vào để ghi điểm.
+        </div>
+
+        <div class="rule">
+          <strong>🔴 Vật nguy hiểm:</strong>
+          Không được chạm vào.
+        </div>
+
+        <div class="rule">
+          <strong>❤️ 3 mạng:</strong>
+          Chạm nhầm vật nguy hiểm sẽ mất 1 mạng.
+        </div>
+
+        <div class="rule">
+          <strong>⏱️ 60 giây:</strong>
+          Hãy thật nhanh và thật chính xác!
+        </div>
+
+      </div>
+
+      <button
+        class="primary-btn"
+        id="startButton"
+      >
+        BẮT ĐẦU NHIỆM VỤ
+      </button>
+
+      <div id="loadingText"></div>
+
+    </div>
+
+  </div>
+
+  <!-- ==========================================
+       END OVERLAY
+       ========================================== -->
+
+  <div
+    class="overlay hidden"
+    id="endOverlay"
+  >
+
+    <div class="panel">
+
+      <div class="logo-circle">
+        🏆
+      </div>
+
+      <h2>Nhiệm vụ hoàn thành!</h2>
+
+      <div
+        class="final-score"
+        id="finalScore"
+      >
+        0
+      </div>
+
+      <div class="final-label">
+        điểm
+      </div>
+
+      <div
+        class="result-message"
+        id="resultMessage"
+      >
+        Đang cập nhật kết quả...
+      </div>
+
+      <div
+        class="leaderboard"
+        id="leaderboard"
+      >
+        <div class="leaderboard-title">
+          🏆 Bảng xếp hạng
+        </div>
+
+        <div class="rank-row header">
+          <div>Hạng</div>
+          <div>Người chơi</div>
+          <div>Điểm</div>
+          <div>Giây</div>
+        </div>
+
+        <div id="leaderboardRows"></div>
+      </div>
+
+      <br>
+
+      <button
+        class="primary-btn"
+        id="restartButton"
+      >
+        CHƠI LẠI
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+  <script src="game.js" defer></script>
+
+
+</body>
+</html>

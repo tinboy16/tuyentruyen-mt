@@ -1,0 +1,106 @@
+services:
+
+  postgres:
+    image: postgres:17-alpine
+    container_name: kids-game-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    networks:
+      - kids-game-network
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+
+  migrate:
+    build:
+      context: .
+      dockerfile: ./apps/api/Dockerfile
+
+    container_name: kids-game-migrate
+
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    command:
+      [
+        "npx",
+        "prisma",
+        "migrate",
+        "deploy"
+      ]
+
+    networks:
+      - kids-game-network
+
+
+  api:
+    build:
+      context: .
+      dockerfile: ./apps/api/Dockerfile
+
+    container_name: kids-game-api
+    restart: unless-stopped
+
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      HOST: 0.0.0.0
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?schema=public
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+      migrate:
+        condition: service_completed_successfully
+
+    networks:
+      - kids-game-network
+
+
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+
+    container_name: kids-game-web
+    restart: unless-stopped
+
+    depends_on:
+      - api
+
+    ports:
+      - "8080:80"
+
+    networks:
+      - kids-game-network
+
+
+networks:
+  kids-game-network:
+    driver: bridge
+
+
+volumes:
+  postgres_data:
